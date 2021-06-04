@@ -76,4 +76,4 @@ class BreadcrumbsApp extends StatelessWidget {
 }
 ```
 
-<img src="assets/example.png" width="300px" />
+<img src="https://raw.githubusercontent.com/DevNico/flutter_breadcrumbs/main/assets/example.png" width="300px" />
