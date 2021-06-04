@@ -1,3 +1,6 @@
+## 0.0.2
+
+* Fixed example image in Readme
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Initial release.

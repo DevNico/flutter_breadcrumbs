@@ -1,6 +1,6 @@
 name: breadcrumbs
 description: Breadcrumbs with automatic overflow handling and high customisability.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/DevNico/flutter_breadcrumbs
 repository: https://github.com/DevNico/flutter_breadcrumbs
 issue_tracker: https://github.com/DevNico/flutter_breadcrumbs/issues
