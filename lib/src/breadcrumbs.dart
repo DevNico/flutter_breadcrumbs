@@ -75,8 +75,10 @@ class Breadcrumbs extends StatefulWidget {
 
 class _BreadcrumbsState extends State<Breadcrumbs> {
   bool isExpanded = false;
+  bool canToggle = true;
 
   void toggleExpansionState() {
+    if (!canToggle) return;
     setState(() {
       isExpanded = !isExpanded;
     });
@@ -143,8 +145,9 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
         var didExceed = false;
         var exceeds = true;
         late TextSpan textSpan;
+        int passes = 0;
 
-        while (exceeds) {
+        while (exceeds && passes < widget.itemCount) {
           textSpan = buildTextSpan(context, removedIndices);
 
           final textPainter = TextPainter(
@@ -165,12 +168,25 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
             indices.removeWhere((element) => removedIndices.contains(element));
 
             var toRemove = indices[(indices.length / 2).floor()];
+
             if (toRemove == indices.last) {
               toRemove -= 1;
             }
 
             removedIndices.add(toRemove);
           }
+
+          passes++;
+        }
+
+        if (passes == widget.itemCount) {
+          // can't collapse
+          WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+            setState(() {
+              canToggle = false;
+              isExpanded = true;
+            });
+          });
         }
 
         return GestureDetector(

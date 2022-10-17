@@ -47,6 +47,17 @@ class BreadcrumbsApp extends StatelessWidget {
                 separator: ' > ',
                 style: TextStyle(color: Colors.black),
               ),
+              Breadcrumbs(
+                crumbs: [
+                  TextSpan(text: 'These breacrumbs'),
+                  TextSpan(text: 'will'),
+                  TextSpan(
+                    text: 'always overflow because I am a super long text',
+                  ),
+                ],
+                separator: ' > ',
+                style: TextStyle(color: Colors.black),
+              ),
             ],
           ),
         ),
