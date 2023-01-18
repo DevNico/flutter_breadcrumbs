@@ -19,22 +19,6 @@ class Breadcrumbs extends StatefulWidget {
 
   final TextAlign textAlign;
 
-  const Breadcrumbs._({
-    Key? key,
-    this.crumbs,
-    this.itemBuilder,
-    int? itemCount,
-    this.separatorBuilder,
-    String? hiddenElementsReplacement,
-    String? separator,
-    this.style,
-    TextAlign? textAlign,
-  })  : itemCount = itemCount ?? crumbs?.length ?? 0,
-        hiddenElementsReplacement = hiddenElementsReplacement ?? '...',
-        separator = separator ?? ' / ',
-        textAlign = textAlign ?? TextAlign.left,
-        super(key: key);
-
   factory Breadcrumbs({
     Key? key,
     required List<TextSpan> crumbs,
@@ -44,6 +28,7 @@ class Breadcrumbs extends StatefulWidget {
     TextAlign? textAlign,
   }) =>
       Breadcrumbs._(
+        key: key,
         crumbs: crumbs,
         separator: separator,
         hiddenElementsReplacement: hiddenElementsReplacement,
@@ -61,6 +46,7 @@ class Breadcrumbs extends StatefulWidget {
     TextAlign? textAlign,
   }) =>
       Breadcrumbs._(
+        key: key,
         itemCount: itemCount,
         itemBuilder: itemBuilder,
         separatorBuilder: separatorBuilder,
@@ -68,6 +54,22 @@ class Breadcrumbs extends StatefulWidget {
         style: style,
         textAlign: textAlign,
       );
+
+  const Breadcrumbs._({
+    Key? key,
+    this.crumbs,
+    this.itemBuilder,
+    int? itemCount,
+    this.separatorBuilder,
+    String? hiddenElementsReplacement,
+    String? separator,
+    this.style,
+    TextAlign? textAlign,
+  })  : itemCount = itemCount ?? crumbs?.length ?? 0,
+        hiddenElementsReplacement = hiddenElementsReplacement ?? '...',
+        separator = separator ?? ' / ',
+        textAlign = textAlign ?? TextAlign.left,
+        super(key: key);
 
   @override
   _BreadcrumbsState createState() => _BreadcrumbsState();
@@ -144,7 +146,7 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
 
         var didExceed = false;
         var exceeds = true;
-        late TextSpan textSpan;
+        var textSpan = const TextSpan(text: '');
         int passes = 0;
 
         while (exceeds && passes < widget.itemCount) {
