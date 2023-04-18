@@ -4,39 +4,34 @@ typedef BreadcrumbBuilder = TextSpan Function(BuildContext context, int index);
 
 class Breadcrumbs extends StatefulWidget {
   final List<TextSpan>? crumbs;
-
   final int itemCount;
-
   final BreadcrumbBuilder? itemBuilder;
-
   final BreadcrumbBuilder? separatorBuilder;
-
   final String separator;
-
   final String hiddenElementsReplacement;
-
   final TextStyle? style;
-
   final TextAlign textAlign;
 
-  factory Breadcrumbs({
+  /// Control the expansion behavior of the breadcrumbs. If set to `true`, the
+  /// breadcrumbs will expand when tapped. If set to `false`, the breadcrumbs
+  /// will not expand when tapped.
+  final bool toggleExpansionOnTap;
+
+  /// Force the expansion state of the breadcrumbs.
+  final bool? expanded;
+
+  const factory Breadcrumbs({
     Key? key,
     required List<TextSpan> crumbs,
     String? separator,
     String? hiddenElementsReplacement,
     TextStyle? style,
     TextAlign? textAlign,
-  }) =>
-      Breadcrumbs._(
-        key: key,
-        crumbs: crumbs,
-        separator: separator,
-        hiddenElementsReplacement: hiddenElementsReplacement,
-        style: style,
-        textAlign: textAlign,
-      );
+    bool? toggleExpansionOnTap,
+    bool? expanded,
+  }) = Breadcrumbs._;
 
-  factory Breadcrumbs.builder({
+  const factory Breadcrumbs.builder({
     Key? key,
     required int itemCount,
     required BreadcrumbBuilder itemBuilder,
@@ -44,16 +39,9 @@ class Breadcrumbs extends StatefulWidget {
     String? hiddenElementsReplacement,
     TextStyle? style,
     TextAlign? textAlign,
-  }) =>
-      Breadcrumbs._(
-        key: key,
-        itemCount: itemCount,
-        itemBuilder: itemBuilder,
-        separatorBuilder: separatorBuilder,
-        hiddenElementsReplacement: hiddenElementsReplacement,
-        style: style,
-        textAlign: textAlign,
-      );
+    bool? toggleExpansionOnTap,
+    bool? expanded,
+  }) = Breadcrumbs._;
 
   const Breadcrumbs._({
     Key? key,
@@ -65,10 +53,13 @@ class Breadcrumbs extends StatefulWidget {
     String? separator,
     this.style,
     TextAlign? textAlign,
+    bool? toggleExpansionOnTap,
+    this.expanded,
   })  : itemCount = itemCount ?? crumbs?.length ?? 0,
         hiddenElementsReplacement = hiddenElementsReplacement ?? '...',
         separator = separator ?? ' / ',
         textAlign = textAlign ?? TextAlign.left,
+        toggleExpansionOnTap = toggleExpansionOnTap ?? true,
         super(key: key);
 
   @override
@@ -76,14 +67,19 @@ class Breadcrumbs extends StatefulWidget {
 }
 
 class _BreadcrumbsState extends State<Breadcrumbs> {
-  bool isExpanded = false;
-  bool canToggle = true;
+  late bool isExpanded = widget.expanded ?? false;
+  bool didExceed = false;
 
-  void toggleExpansionState() {
-    if (!canToggle) return;
-    setState(() {
-      isExpanded = !isExpanded;
-    });
+  VoidCallback? toggleExpansionState() {
+    if (!widget.toggleExpansionOnTap || widget.expanded != null || !didExceed) {
+      return null;
+    }
+
+    return () {
+      setState(() {
+        isExpanded = !isExpanded;
+      });
+    };
   }
 
   TextSpan _separator(BuildContext context, int index) {
@@ -132,7 +128,7 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
   Widget build(BuildContext context) {
     if (isExpanded) {
       return GestureDetector(
-        onTap: toggleExpansionState,
+        onTap: toggleExpansionState(),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: RichText(text: buildTextSpan(context)),
@@ -144,7 +140,6 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
       builder: (context, constraints) {
         final removedIndices = <int>[];
 
-        var didExceed = false;
         var exceeds = true;
         var textSpan = const TextSpan(text: '');
         int passes = 0;
@@ -163,7 +158,7 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
           // Wether the text overflowed or not
           exceeds = textPainter.didExceedMaxLines;
 
-          if (exceeds && !isExpanded) {
+          if (exceeds) {
             didExceed = true;
 
             final indices = List.generate(widget.itemCount, (index) => index);
@@ -181,18 +176,17 @@ class _BreadcrumbsState extends State<Breadcrumbs> {
           passes++;
         }
 
-        if (passes == widget.itemCount) {
+        if (passes == widget.itemCount && !exceeds) {
           // can't collapse
           WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
             setState(() {
-              canToggle = false;
               isExpanded = true;
             });
           });
         }
 
         return GestureDetector(
-          onTap: didExceed ? toggleExpansionState : null,
+          onTap: toggleExpansionState(),
           child: RichText(
             text: textSpan,
             maxLines: 1,

@@ -1,3 +1,8 @@
+## 0.1.0
+
+* The expansion toggle behaviour on tap can now be disabled by setting `toggleExpansionOnTap` to `false`.
+* Force expansion state by setting `expanded` to `true` or `false`.
+
 ## 0.0.5
 
 * Fixed late init error
